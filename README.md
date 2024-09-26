@@ -1,3 +1,4 @@
+--[[
 loadstring(game:HttpGet("https://raw.githubusercontent.com/MAJESTY5164/ArsenalGunModding/refs/heads/main/Source.lua"))()
     
     --  modall()
@@ -16,3 +17,4 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/MAJESTY5164/ArsenalGu
     }
     ModSpecific()
     --]]
+--]]
