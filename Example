@@ -1,0 +1,287 @@
+Moddingtemplate = {
+    "Gun",
+    "Bullets",
+    "FireRate",
+    "Auto",
+    "RecoilControl",
+    "Ammo"
+}
+
+function Edit(g, n, v)
+    if g:FindFirstChild(n) and g[n]:IsA("ValueBase") then
+        g[n].Value = v
+    else
+        warn(g.Name .. ' does not have a value for "' .. n .. '"')
+    end
+end
+
+function Modify(fg, n, v)
+    local g = game:GetService("ReplicatedStorage").Weapons:WaitForChild(fg)
+    Edit(g, n, v)
+end
+
+function mod(g)
+    print('Modding ' .. g)
+    Modify(g, "Bullets", 10)
+    Modify(g, "FireRate", 0.011)
+    Modify(g, "Auto", true)
+    Modify(g, "RecoilControl", 0)
+    Modify(g, "Ammo", 999)
+end
+
+getgenv().modlite = function(g)
+    print('Modding ' .. g)
+    Modify(g, "FireRate", 0.011)
+    Modify(g, "Auto", true)
+    Modify(g, "RecoilControl", 0)
+    Modify(g, "Ammo", 999)
+end
+
+getgenv().modall = function()
+    local weapons = game:GetService("ReplicatedStorage").Weapons:GetChildren()
+    for i = 1, #weapons do
+        mod(weapons[i].Name)
+    end
+end
+
+getgenv().modalllite = function()
+    local weapons = game:GetService("ReplicatedStorage").Weapons:GetChildren()
+    for i = 1, #weapons do
+        modlite(weapons[i].Name)
+    end
+end
+
+getgenv().modSpecific = function(Modding)
+    print('Modding ' .. Modding["Gun"])
+    for i = 1, 6 do
+        if Moddingtemplate[i] ~= "Gun" then
+            if Modding[Moddingtemplate[i]] ~= nil then
+                print(Moddingtemplate[i] .. " " .. tostring(Modding[Moddingtemplate[i]]))
+                Modify(Modding["Gun"], Moddingtemplate[i], Modding[Moddingtemplate[i]])
+            end
+        end
+    end
+end
+
+StoreInfo = {}
+
+for i = 1, #game:GetService("ReplicatedStorage").Weapons:GetChildren() do
+    local Gun = game:GetService("ReplicatedStorage").Weapons:GetChildren()[i]
+    if tostring(Gun) ~= "Standing" then
+        StoreInfo[#StoreInfo + 1] = Gun
+        StoreInfo[#StoreInfo + 1] = Gun.Ammo.Value
+        StoreInfo[#StoreInfo + 1] = Gun.Auto.Value
+        StoreInfo[#StoreInfo + 1] = Gun.Bullets.Value
+        StoreInfo[#StoreInfo + 1] = Gun.FireRate.Value
+        StoreInfo[#StoreInfo + 1] = Gun.RecoilControl.Value
+    end
+end
+print("Arsenal Gun Mod modual has loaded")
+
+local function findInTable(table, name)
+    for i = 1, #table, 6 do
+        if table[i].Name == name then
+            return i
+        end
+    end
+    return nil
+end
+
+getgenv().reset = function(g)
+    local pos = findInTable(StoreInfo, g)
+    if pos then
+        print("Resetting " .. g)
+        Modify(g, "Bullets", StoreInfo[pos + 3])
+        Modify(g, "FireRate", StoreInfo[pos + 4])
+        Modify(g, "Auto", StoreInfo[pos + 2])
+        Modify(g, "RecoilControl", StoreInfo[pos + 5])
+        Modify(g, "Ammo", StoreInfo[pos + 1])
+    else
+        warn("Gun not found: " .. g)
+    end
+end
+
+ getgenv().resetall = function()
+    local weapons = game:GetService("ReplicatedStorage").Weapons:GetChildren()
+    for i = 1, #weapons do
+        reset(weapons[i].Name)
+    end
+end
+    
+local screenGui = Instance.new("ScreenGui")
+screenGui.DisplayOrder = 9999999
+screenGui.Name = "ModMenuGui"
+screenGui.Parent = game:GetService("CoreGui")
+
+local BackgroundGui2 = Instance.new("ScreenGui")
+BackgroundGui2.DisplayOrder = 9999999
+BackgroundGui2.Name = "BackgroundGui2"
+BackgroundGui2.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+
+local BackgroundGuiFrame = Instance.new("Frame")
+BackgroundGuiFrame.Name = "BackgroundGuiFrame"
+BackgroundGuiFrame.Parent = BackgroundGui2
+BackgroundGuiFrame.Size = UDim2.new(10, 0, 10, 0)
+BackgroundGuiFrame.Position = UDim2.new(0, 0, 0, 0)
+BackgroundGuiFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+BackgroundGuiFrame.BorderSizePixel = 0 
+BackgroundGuiFrame.BackgroundTransparency = 0 
+BackgroundGuiFrame.Visible = true
+
+local BackgroundGuiFrame1 = Instance.new("Frame")
+BackgroundGuiFrame1.Name = "BackgroundGuiFrame1"
+BackgroundGuiFrame1.Parent = screenGui
+BackgroundGuiFrame1.Size = UDim2.new(10, 0, 10, 0) 
+BackgroundGuiFrame1.Position = UDim2.new(0.72, 0, -0.035, 0) 
+BackgroundGuiFrame1.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2) 
+BackgroundGuiFrame1.BorderSizePixel = 0 
+BackgroundGuiFrame1.BackgroundTransparency = 0 
+BackgroundGuiFrame1.Visible = true
+
+local BackgroundGuiFrame2 = Instance.new("Frame")
+BackgroundGuiFrame2.Name = "BackgroundGuiFrame2"
+BackgroundGuiFrame2.Parent = screenGui
+BackgroundGuiFrame2.Size = UDim2.new(10, 0, 10, 0) 
+BackgroundGuiFrame2.Position = UDim2.new(-9.72, 0, -0.035, 0) 
+BackgroundGuiFrame2.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2) 
+BackgroundGuiFrame2.BorderSizePixel = 0 
+BackgroundGuiFrame2.BackgroundTransparency = 0 
+BackgroundGuiFrame2.Visible = true
+
+local BackgroundGuiFrame3 = Instance.new("Frame")
+BackgroundGuiFrame3.Name = "BackgroundGuiFrame3"
+BackgroundGuiFrame3.Parent = screenGui
+BackgroundGuiFrame3.Size = UDim2.new(10, 0, 10, 0) 
+BackgroundGuiFrame3.Position = UDim2.new(0, 0, 0.85, 0) 
+BackgroundGuiFrame3.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2) 
+BackgroundGuiFrame3.BorderSizePixel = 0 
+BackgroundGuiFrame3.BackgroundTransparency = 0 
+BackgroundGuiFrame3.Visible = true
+
+local BackgroundGuiFrame4 = Instance.new("Frame")
+BackgroundGuiFrame4.Name = "BackgroundGuiFrame4"
+BackgroundGuiFrame4.Parent = screenGui
+BackgroundGuiFrame4.Size = UDim2.new(10, 0, 10, 0) 
+BackgroundGuiFrame4.Position = UDim2.new(0, 0, -9.86, 0) 
+BackgroundGuiFrame4.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2) 
+BackgroundGuiFrame4.BorderSizePixel = 0 
+BackgroundGuiFrame4.BackgroundTransparency = 0 
+BackgroundGuiFrame4.Visible = true
+
+
+local txtFrame = Instance.new("Frame")
+txtFrame.Name = "textFrame"
+txtFrame.Parent = screenGui
+txtFrame.Size = UDim2.new(1, 0, 0.045, 0) 
+txtFrame.Position = UDim2.new(0, 0, -0.035, 0) 
+txtFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2) 
+txtFrame.BorderSizePixel = 0 
+txtFrame.Visible = true 
+
+local modMenuFrame = Instance.new("Frame")
+modMenuFrame.Name = "ModMenuFrame"
+modMenuFrame.Parent = screenGui
+modMenuFrame.Size = UDim2.new(0.28, 0, 0.6, 0) 
+modMenuFrame.Position = UDim2.new(0, 0, -0.035, 0) 
+modMenuFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2) 
+modMenuFrame.BorderSizePixel = 0 
+modMenuFrame.BackgroundTransparency = 1 
+modMenuFrame.Visible = true 
+
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Name = "TitleLabel"
+titleLabel.Parent = txtFrame
+titleLabel.Size = UDim2.new(1, -50, 0, 50)
+titleLabel.Position = UDim2.new(0, 0, 0, 0)
+titleLabel.Text = "Made by MAJESTY"
+titleLabel.TextSize = 24
+titleLabel.TextColor3 = Color3.new(1, 1, 1) 
+titleLabel.BackgroundTransparency = 1 
+
+local LiteButton = Instance.new("TextButton")
+LiteButton.Name = "LiteButton"
+LiteButton.Parent = modMenuFrame
+LiteButton.Size = UDim2.new(0.8, 0, 0, 50) 
+LiteButton.Position = UDim2.new(0, 0, 0.2, 0) 
+LiteButton.Text = "Mod All weapons"
+LiteButton.TextSize = 20
+LiteButton.TextColor3 = Color3.new(1, 1, 1)
+LiteButton.BackgroundColor3 = Color3.new(255, 0, 0) 
+LiteButton.BorderSizePixel = 0
+
+local ResetAllButton = Instance.new("TextButton")
+ResetAllButton.Name = "ResetAllButton"
+ResetAllButton.Parent = modMenuFrame
+ResetAllButton.Size = UDim2.new(0.8, 0, 0, 50)
+ResetAllButton.Position = UDim2.new(0, 0, 0.3, 0) 
+ResetAllButton.Text = "Reset All weapons"
+ResetAllButton.TextSize = 20
+ResetAllButton.TextColor3 = Color3.new(1, 1, 1) 
+ResetAllButton.BackgroundColor3 = Color3.new(255, 0, 0) 
+ResetAllButton.BorderSizePixel = 0
+
+local AirHubButton = Instance.new("TextButton")
+AirHubButton.Name = "AirHubButton"
+AirHubButton.Parent = modMenuFrame
+AirHubButton.Size = UDim2.new(0.8, 0, 0, 50) 
+AirHubButton.Position = UDim2.new(0, 0, 0.4, 0) 
+AirHubButton.Text = "AirHub"
+AirHubButton.TextSize = 20
+AirHubButton.TextColor3 = Color3.new(1, 1, 1) 
+AirHubButton.BackgroundColor3 = Color3.new(255, 0, 0) 
+AirHubButton.BorderSizePixel = 0
+
+local ModAll = Instance.new("TextButton")
+ModAll.Name = "ModAll"
+ModAll.Parent = modMenuFrame
+ModAll.Size = UDim2.new(3.6, 0, 0.15, 0) 
+ModAll.Position = UDim2.new(0, 0, 1.58, 0) 
+ModAll.Text = "Mod All weapons (with increased bullets) - THIS WILL CAUSE LAG"
+ModAll.TextSize = 25
+ModAll.TextColor3 = Color3.new(1, 1, 1) 
+ModAll.BackgroundColor3 = Color3.new(255, 0, 0) 
+ModAll.BorderSizePixel = 0
+
+local function onModAllClick()
+    modall() 
+end
+
+local function onLiteClick()
+    modalllite() 
+end
+
+local function onResetAllClick()
+    resetall() 
+end
+
+local function onAirHubClick()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Exunys/AirHub/main/AirHub.lua"))()
+end
+
+ModAll.MouseButton1Click:Connect(onModAllClick)
+LiteButton.MouseButton1Click:Connect(onLiteClick)
+ResetAllButton.MouseButton1Click:Connect(onResetAllClick)
+AirHubButton.MouseButton1Click:Connect(onAirHubClick)
+
+local GuiService = game:GetService("GuiService")
+
+GuiService:GetPropertyChangedSignal("MenuIsOpen"):Connect(function()
+    if GuiService.MenuIsOpen then
+        txtFrame.Visible = true
+        modMenuFrame.Visible = true
+        BackgroundGuiFrame.Visible = true
+        BackgroundGuiFrame1.Visible = true
+        BackgroundGuiFrame2.Visible = true
+        BackgroundGuiFrame3.Visible = true
+        BackgroundGuiFrame4.Visible = true
+    else
+        txtFrame.Visible = false
+        modMenuFrame.Visible = false
+        BackgroundGuiFrame.Visible = false
+        BackgroundGuiFrame1.Visible = false
+        BackgroundGuiFrame2.Visible = false
+        BackgroundGuiFrame3.Visible = false
+        BackgroundGuiFrame4.Visible = false
+    end
+end)
