@@ -1,3 +1,5 @@
+--loadstring(game:HttpGet("https://raw.https://github.com/MAJESTY5164/ArsenalGunModding/edit/main/Example"))()
+
 Moddingtemplate = {
     "Gun",
     "Bullets",
