@@ -2,7 +2,6 @@
     loadstring(game:HttpGet("https://raw.githubusercontent.com/MAJESTY5164/ArsenalGunModding/refs/heads/main/Source.lua"))()
     
     --  modall()
-    --  modalllite()
     --  mod(Gun)
     --  resetall()
     --  reset(Gun)
@@ -14,6 +13,8 @@
     Auto = true,
     Recoil = 0,
     Ammo = 999
+    Spread = 0,
+    MaxSpread = 0
     }
     ModSpecific()
     --]]
