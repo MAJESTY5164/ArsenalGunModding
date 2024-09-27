@@ -47,7 +47,11 @@ function Modify(fg, n, v)
 end
 
 getgenv().mod = function(g, v)
+    if v == nil then
+    print('Modding' .. g)
+    else
     print('Modding ' .. g.. " with ".. v)
+    end
     Modify(g, "FireRate", 0.011)
     Modify(g, "Auto", true)
     Modify(g, "RecoilControl", 0)
@@ -144,7 +148,6 @@ end
 end
     
     --  modall()
-    --  modalllite()
     --  mod(Gun)
     --  resetall()
     --  reset(Gun)
