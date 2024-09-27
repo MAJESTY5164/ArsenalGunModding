@@ -1,3 +1,21 @@
+ if getgenv().ArsenalModsLoaded == nil then
+local weapons = game:GetService("ReplicatedStorage"):WaitForChild("Weapons"):GetChildren()
+
+-- Function to check if a weapon has "MaxSpread" based on the weapon's name
+local function checkMS(weaponName)
+    -- Find the weapon in the "Weapons" folder by name
+    local specificWeapon = game:GetService("ReplicatedStorage"):WaitForChild("Weapons"):FindFirstChild(weaponName)
+    
+    -- If the weapon exists, check if it has "MaxSpread"
+    if specificWeapon then
+        local maxSpreadChild = specificWeapon:FindFirstChild("MaxSpread")
+        return maxSpreadChild ~= nil -- Return true if "MaxSpread" exists, false otherwise
+    else
+        return false -- Return false if the weapon doesn't exist
+    end
+end
+
+
 Moddingtemplate = {
     "Gun",
     "Bullets",
@@ -19,41 +37,37 @@ end
 
 function Modify(fg, n, v)
     local g = game:GetService("ReplicatedStorage").Weapons:WaitForChild(fg)
-    Edit(g, n, v)
-end
-
-function mod(g)
-    print('Modding ' .. g)
-    Modify(g, "Bullets", 10)
-    Modify(g, "FireRate", 0.011)
-    Modify(g, "Auto", true)
-    Modify(g, "RecoilControl", 0)
-    Modify(g, "Ammo", 99999)
-    Modify(g, "Spread", 0)
-    Modify(g, "MaxSpread", 0)
-end
-
-getgenv().modlite = function(g)
-    print('Modding ' .. g)
-    Modify(g, "FireRate", 0.011)
-    Modify(g, "Auto", true)
-    Modify(g, "RecoilControl", 0)
-    Modify(g, "Ammo", 99999)
-    Modify(g, "Spread", 0)
-    Modify(g, "MaxSpread", 0)
-end
-
-getgenv().modall = function()
-    local weapons = game:GetService("ReplicatedStorage").Weapons:GetChildren()
-    for i = 1, #weapons do
-        mod(weapons[i].Name)
+    if n == "MaxSpread" then
+        if checkMS(fg) then
+        Edit(g, n, v)
+        end
+    else
+        Edit(g, n, v)
     end
 end
 
-getgenv().modalllite = function()
+getgenv().mod = function(g, v)
+    print('Modding ' .. g.. " with ".. v)
+    Modify(g, "FireRate", 0.011)
+    Modify(g, "Auto", true)
+    Modify(g, "RecoilControl", 0)
+    Modify(g, "Ammo", 999)
+    Modify(g, "Spread", 0)
+    if v ~= nil then
+    Modify(g, "Bullets", v)
+    else
+    Modify(g, "MaxSpread", 0)
+    end
+end
+
+getgenv().modall = function(v)
     local weapons = game:GetService("ReplicatedStorage").Weapons:GetChildren()
     for i = 1, #weapons do
-        modlite(weapons[i].Name)
+        if v ~= nil then
+        mod(weapons[i].Name, v)
+        else
+        mod(weapons[i].Name)
+        end
     end
 end
 
@@ -71,6 +85,8 @@ end
 
 StoreInfo = {}
 
+if #StoreInfo == 3 then
+
 for i = 1, #game:GetService("ReplicatedStorage").Weapons:GetChildren() do
     local Gun = game:GetService("ReplicatedStorage").Weapons:GetChildren()[i]
     if tostring(Gun) ~= "Standing" then
@@ -81,8 +97,14 @@ for i = 1, #game:GetService("ReplicatedStorage").Weapons:GetChildren() do
         StoreInfo[#StoreInfo + 1] = Gun.FireRate.Value
         StoreInfo[#StoreInfo + 1] = Gun.RecoilControl.Value
         StoreInfo[#StoreInfo + 1] = Gun.Spread.Value
+        if checkMS(Gun) then
         StoreInfo[#StoreInfo + 1] = Gun.MaxSpread.Value
+        else
+            StoreInfo[#StoreInfo + 1] = nil
+        end
     end
+end
+print("Weapons have been saved")
 end
 print("Arsenal Gun Mod modual has loaded")
 
@@ -105,7 +127,9 @@ getgenv().reset = function(g)
         Modify(g, "RecoilControl", StoreInfo[pos + 5])
         Modify(g, "Ammo", StoreInfo[pos + 1])
         Modify(g, "Spread", StoreInfo[pos + 6])
+        if checkMS(g) then
         Modify(g, "MaxSpread", StoreInfo[pos + 7])
+        end
     else
         warn("Gun not found: " .. g)
     end
@@ -116,6 +140,7 @@ end
     for i = 1, #weapons do
         reset(weapons[i].Name)
     end
+end
 end
     
     --  modall()
