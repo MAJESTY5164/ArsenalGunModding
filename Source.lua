@@ -4,7 +4,9 @@ Moddingtemplate = {
     "FireRate",
     "Auto",
     "RecoilControl",
-    "Ammo"
+    "Ammo",
+    "Spread",
+    "MaxSpread"
 }
 
 function Edit(g, n, v)
@@ -26,7 +28,9 @@ function mod(g)
     Modify(g, "FireRate", 0.011)
     Modify(g, "Auto", true)
     Modify(g, "RecoilControl", 0)
-    Modify(g, "Ammo", 999)
+    Modify(g, "Ammo", 99999)
+    Modify(g, "Spread", 0)
+    Modify(g, "MaxSpread", 0)
 end
 
 getgenv().modlite = function(g)
@@ -34,7 +38,9 @@ getgenv().modlite = function(g)
     Modify(g, "FireRate", 0.011)
     Modify(g, "Auto", true)
     Modify(g, "RecoilControl", 0)
-    Modify(g, "Ammo", 999)
+    Modify(g, "Ammo", 99999)
+    Modify(g, "Spread", 0)
+    Modify(g, "MaxSpread", 0)
 end
 
 getgenv().modall = function()
@@ -53,7 +59,7 @@ end
 
 getgenv().modSpecific = function(Modding)
     print('Modding ' .. Modding["Gun"])
-    for i = 1, 6 do
+    for i = 1, 8 do
         if Moddingtemplate[i] ~= "Gun" then
             if Modding[Moddingtemplate[i]] ~= nil then
                 print(Moddingtemplate[i] .. " " .. tostring(Modding[Moddingtemplate[i]]))
@@ -74,6 +80,8 @@ for i = 1, #game:GetService("ReplicatedStorage").Weapons:GetChildren() do
         StoreInfo[#StoreInfo + 1] = Gun.Bullets.Value
         StoreInfo[#StoreInfo + 1] = Gun.FireRate.Value
         StoreInfo[#StoreInfo + 1] = Gun.RecoilControl.Value
+        StoreInfo[#StoreInfo + 1] = Gun.Spread.Value
+        StoreInfo[#StoreInfo + 1] = Gun.MaxSpread.Value
     end
 end
 print("Arsenal Gun Mod modual has loaded")
@@ -96,6 +104,8 @@ getgenv().reset = function(g)
         Modify(g, "Auto", StoreInfo[pos + 2])
         Modify(g, "RecoilControl", StoreInfo[pos + 5])
         Modify(g, "Ammo", StoreInfo[pos + 1])
+        Modify(g, "Spread", StoreInfo[pos + 6])
+        Modify(g, "MaxSpread", StoreInfo[pos + 7])
     else
         warn("Gun not found: " .. g)
     end
@@ -120,7 +130,9 @@ end
     FireRate = 0.011, --Minimum is 0.011
     Auto = true,
     Recoil = 0,
-    Ammo = 999
+    Ammo = 999,
+    Spread = 0,
+    MaxSpread = 0
     }
     ModSpecific()
     --]]
