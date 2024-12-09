@@ -1,166 +1,122 @@
 if getgenv().ArsenalModsLoaded == nil then
-    local weapons = game:GetService("ReplicatedStorage"):WaitForChild("Weapons"):GetChildren()
+     weapons = game:GetService("ReplicatedStorage"):WaitForChild("Weapons"):GetChildren()
     
-    -- Function to check if a weapon has "MaxSpread" based on the weapon's name
-    local function checkMS(weaponName)
-        -- Find the weapon in the "Weapons" folder by name
-        local specificWeapon = game:GetService("ReplicatedStorage"):WaitForChild("Weapons"):FindFirstChild(weaponName)
-        
-        -- If the weapon exists, check if it has "MaxSpread"
+    -- Function to check if a weapon has "MaxSpread"
+     function checkMS(weaponName)
+         specificWeapon = game:GetService("ReplicatedStorage"):WaitForChild("Weapons"):FindFirstChild(weaponName)
         if specificWeapon then
-            local maxSpreadChild = specificWeapon:FindFirstChild("MaxSpread")
-            return maxSpreadChild ~= nil -- Return true if "MaxSpread" exists, false otherwise
-        else
-            return false -- Return false if the weapon doesn't exist
+            return specificWeapon:FindFirstChild("MaxSpread") ~= nil
         end
+        return false
     end
-    
-    
-    Moddingtemplate = {
-        "Gun",
-        "Bullets",
-        "FireRate",
-        "Auto",
-        "RecoilControl",
-        "Ammo",
-        "Spread",
-        "MaxSpread"
+
+    -- Define modding template
+     Moddingtemplate = {
+        "Gun", "Bullets", "FireRate", "Auto", "RecoilControl", "Ammo", "Spread", "MaxSpread"
     }
-    
-    function Edit(g, n, v)
+
+    -- Function to edit weapon properties
+     function Edit(g, n, v)
         if g:FindFirstChild(n) and g[n]:IsA("ValueBase") then
             g[n].Value = v
         else
             warn(g.Name .. ' does not have a value for "' .. n .. '"')
         end
     end
-    
-    function Modify(fg, n, v)
-        local g = game:GetService("ReplicatedStorage").Weapons:WaitForChild(fg)
-        if n == "MaxSpread" then
-            if checkMS(fg) then
+
+    -- Function to modify a weapon property
+     function Modify(fg, n, v)
+         g = game:GetService("ReplicatedStorage").Weapons:WaitForChild(fg)
+        if n == "MaxSpread" and checkMS(fg) then
             Edit(g, n, v)
-            end
-        else
+        elseif n ~= "MaxSpread" then
             Edit(g, n, v)
         end
     end
-    
+
+    -- Function to apply mods to a weapon
     getgenv().mod = function(g, v)
-        if v == nil then
-        print('Modding' .. g)
-        else
-        print('Modding ' .. g.. " with ".. v.. " bullets per shot")
-        end
+        print(v and ('Modding ' .. g .. " with " .. v .. " bullets per shot") or ("Modding " .. g))
         Modify(g, "FireRate", 0.011)
         Modify(g, "Auto", true)
         Modify(g, "RecoilControl", 0)
         Modify(g, "Ammo", 999)
         Modify(g, "Spread", 0)
-        if v ~= nil then
-        Modify(g, "Bullets", v)
+        if v then
+            Modify(g, "Bullets", v)
         else
-        Modify(g, "MaxSpread", 0)
+            Modify(g, "MaxSpread", 0)
         end
     end
-    
+
+    -- Function to apply mods to all weapons
     getgenv().modall = function(v)
-        local weapons = game:GetService("ReplicatedStorage").Weapons:GetChildren()
-        for i = 1, #weapons do
-            if v ~= nil then
-            mod(weapons[i].Name, v)
-            else
-            mod(weapons[i].Name)
-            end
+        for _, weapon in ipairs(game:GetService("ReplicatedStorage").Weapons:GetChildren()) do
+            mod(weapon.Name, v)
         end
     end
-    
+
+    -- Function to apply specific mods
     getgenv().modSpecific = function(Modding)
         print('Modding ' .. Modding["Gun"])
-        for i = 1, 8 do
-            if Moddingtemplate[i] ~= "Gun" then
-                if Modding[Moddingtemplate[i]] ~= nil then
-                    print(Moddingtemplate[i] .. " " .. tostring(Modding[Moddingtemplate[i]]))
-                    Modify(Modding["Gun"], Moddingtemplate[i], Modding[Moddingtemplate[i]])
-                end
+        for _, property in ipairs(Moddingtemplate) do
+            if property ~= "Gun" and Modding[property] ~= nil then
+                print(property .. " " .. tostring(Modding[property]))
+                Modify(Modding["Gun"], property, Modding[property])
             end
         end
     end
-    
-    StoreInfo = {}
-    
+
+    -- Store original weapon data
+     StoreInfo = {}
     if #StoreInfo == 0 then
-    
-    for i = 1, #game:GetService("ReplicatedStorage").Weapons:GetChildren() do
-        local Gun = game:GetService("ReplicatedStorage").Weapons:GetChildren()[i]
-        if tostring(Gun) ~= "Standing" then
-            StoreInfo[#StoreInfo + 1] = Gun
-            StoreInfo[#StoreInfo + 1] = Gun.Ammo.Value
-            StoreInfo[#StoreInfo + 1] = Gun.Auto.Value
-            StoreInfo[#StoreInfo + 1] = Gun.Bullets.Value
-            StoreInfo[#StoreInfo + 1] = Gun.FireRate.Value
-            StoreInfo[#StoreInfo + 1] = Gun.RecoilControl.Value
-            StoreInfo[#StoreInfo + 1] = Gun.Spread.Value
-            if checkMS(Gun) then
-            StoreInfo[#StoreInfo + 1] = Gun.MaxSpread.Value
-            else
-                StoreInfo[#StoreInfo + 1] = nil
+        for _, gun in ipairs(game:GetService("ReplicatedStorage").Weapons:GetChildren()) do
+            if gun:IsA("Folder") and gun.Name ~= "Standing" then
+                table.insert(StoreInfo, {
+                    Name = gun.Name,
+                    Ammo = gun:FindFirstChild("Ammo") and gun.Ammo.Value,
+                    Auto = gun:FindFirstChild("Auto") and gun.Auto.Value,
+                    Bullets = gun:FindFirstChild("Bullets") and gun.Bullets.Value,
+                    FireRate = gun:FindFirstChild("FireRate") and gun.FireRate.Value,
+                    RecoilControl = gun:FindFirstChild("RecoilControl") and gun.RecoilControl.Value,
+                    Spread = gun:FindFirstChild("Spread") and gun.Spread.Value,
+                    MaxSpread = checkMS(gun.Name) and gun:FindFirstChild("MaxSpread") and gun.MaxSpread.Value or nil
+                })
             end
         end
+        print("Weapons have been saved")
     end
-    print("Weapons have been saved")
-    end
-    print("Arsenal Gun Mod modual has loaded")
-    
-    local function findInTable(table, name)
-        for i = 1, #table, 6 do
-            if table[i].Name == name then
-                return i
+    print("Arsenal Gun Mod module has loaded")
+
+    -- Function to find weapon in StoreInfo
+     function findInTable(tbl, name)
+        for _, data in ipairs(tbl) do
+            if data.Name == name then
+                return data
             end
         end
         return nil
     end
-    
+
+    -- Function to reset weapon mods
     getgenv().reset = function(g)
-        local pos = findInTable(StoreInfo, g)
-        if pos then
+         data = findInTable(StoreInfo, g)
+        if data then
             print("Resetting " .. g)
-            Modify(g, "Bullets", StoreInfo[pos + 3])
-            Modify(g, "FireRate", StoreInfo[pos + 4])
-            Modify(g, "Auto", StoreInfo[pos + 2])
-            Modify(g, "RecoilControl", StoreInfo[pos + 5])
-            Modify(g, "Ammo", StoreInfo[pos + 1])
-            Modify(g, "Spread", StoreInfo[pos + 6])
-            if checkMS(g) then
-            Modify(g, "MaxSpread", StoreInfo[pos + 7])
+            for property, value in pairs(data) do
+                if property ~= "Name" then
+                    Modify(g, property, value)
+                end
             end
         else
             warn("Gun not found: " .. g)
         end
     end
-    
-     getgenv().resetall = function()
-        local weapons = game:GetService("ReplicatedStorage").Weapons:GetChildren()
-        for i = 1, #weapons do
-            reset(weapons[i].Name)
+
+    -- Function to reset all weapon mods
+    getgenv().resetall = function()
+        for _, weapon in ipairs(game:GetService("ReplicatedStorage").Weapons:GetChildren()) do
+            reset(weapon.Name)
         end
     end
-    end
-        
-        --  modall()
-        --  mod(Gun)
-        --  resetall()
-        --  reset(Gun)
-        --[[
-        Modding = {
-        Gun = "DBS",
-        Bullets = 100, --Bullets per shot
-        FireRate = 0.011, --Minimum is 0.011
-        Auto = true,
-        Recoil = 0,
-        Ammo = 999,
-        Spread = 0,
-        MaxSpread = 0
-        }
-        ModSpecific()
-        --]]
+end
