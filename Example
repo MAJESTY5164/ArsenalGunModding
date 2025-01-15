@@ -1,176 +1,254 @@
-    weapons = game:GetService("ReplicatedStorage"):WaitForChild("Weapons"):GetChildren()
-    
-    -- Function to check if a weapon has "MaxSpread"
-     function checkMS(weaponName)
-         specificWeapon = game:GetService("ReplicatedStorage"):WaitForChild("Weapons"):FindFirstChild(weaponName)
-        if specificWeapon then
-            return specificWeapon:FindFirstChild("MaxSpread") ~= nil
-        end
-        return false
-    end
+ArsenalAPI = "https://raw.githubusercontent.com/MAJESTY5164/ArsenalGunModding/refs/heads/main/Source.lua"
+loadstring(game:HttpGet(ArsenalAPI))()
 
-    -- Define modding template
-     Moddingtemplate = {
-        "Gun", "Bullets", "FireRate", "Auto", "RecoilControl", "Ammo", "Spread", "MaxSpread"
-    }
-
-    -- Function to edit weapon properties
-     function Edit(g, n, v)
-        if g:FindFirstChild(n) and g[n]:IsA("ValueBase") then
-            g[n].Value = v
-        else
-            warn(g.Name .. ' does not have a value for "' .. n .. '"')
-        end
-    end
-
-    -- Function to modify a weapon property
-     function Modify(fg, n, v)
-         g = game:GetService("ReplicatedStorage").Weapons:WaitForChild(fg)
-        if n == "MaxSpread" and checkMS(fg) then
-            Edit(g, n, v)
-        elseif n ~= "MaxSpread" then
-            Edit(g, n, v)
-        end
-    end
-
-    -- Function to apply mods to a weapon
-    getgenv().mod = function(g, v)
-        print(v and ('Modding ' .. g .. " with " .. v .. " bullets per shot") or ("Modding " .. g))
-        Modify(g, "FireRate", 0.011)
-        Modify(g, "Auto", true)
-        Modify(g, "RecoilControl", 0)
-        Modify(g, "Ammo", 999)
-        Modify(g, "Spread", 0)
-        if v then
-            Modify(g, "Bullets", v)
-        else
-            Modify(g, "MaxSpread", 0)
-        end
-    end
-
-    -- Function to apply mods to all weapons
-    getgenv().modall = function(v)
-        for _, weapon in ipairs(game:GetService("ReplicatedStorage").Weapons:GetChildren()) do
-            mod(weapon.Name, v)
-        end
-    end
-
-    -- Function to apply specific mods
-    getgenv().modSpecific = function(Modding)
-        print('Modding ' .. Modding["Gun"])
-        for _, property in ipairs(Moddingtemplate) do
-            if property ~= "Gun" and Modding[property] ~= nil then
-                print(property .. " " .. tostring(Modding[property]))
-                Modify(Modding["Gun"], property, Modding[property])
-            end
-        end
-    end
-
-    -- Store original weapon data
-     StoreInfo = {}
-    if #StoreInfo == 0 then
-        for _, gun in ipairs(game:GetService("ReplicatedStorage").Weapons:GetChildren()) do
-            if gun:IsA("Folder") and gun.Name ~= "Standing" then
-                table.insert(StoreInfo, {
-                    Name = gun.Name,
-                    Ammo = gun:FindFirstChild("Ammo") and gun.Ammo.Value,
-                    Auto = gun:FindFirstChild("Auto") and gun.Auto.Value,
-                    Bullets = gun:FindFirstChild("Bullets") and gun.Bullets.Value,
-                    FireRate = gun:FindFirstChild("FireRate") and gun.FireRate.Value,
-                    RecoilControl = gun:FindFirstChild("RecoilControl") and gun.RecoilControl.Value,
-                    Spread = gun:FindFirstChild("Spread") and gun.Spread.Value,
-                    MaxSpread = checkMS(gun.Name) and gun:FindFirstChild("MaxSpread") and gun.MaxSpread.Value or nil
-                })
-            end
-        end
-        print("Weapons have been saved")
-    end
-    print("Arsenal Gun Mod module has loaded")
-
-    -- Function to find weapon in StoreInfo
-     function findInTable(tbl, name)
-        for _, data in ipairs(tbl) do
-            if data.Name == name then
-                return data
-            end
-        end
-        return nil
-    end
-
-    -- Function to reset weapon mods
-    getgenv().reset = function(g)
-         data = findInTable(StoreInfo, g)
-        if data then
-            print("Resetting " .. g)
-            for property, value in pairs(data) do
-                if property ~= "Name" then
-                    Modify(g, property, value)
-                end
-            end
-        else
-            warn("Gun not found: " .. g)
-        end
-    end
-
-    -- Function to reset all weapon mods
-    getgenv().resetall = function()
-        for _, weapon in ipairs(game:GetService("ReplicatedStorage").Weapons:GetChildren()) do
-            reset(weapon.Name)
-        end
-    end
-
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-
-local Window = Rayfield:CreateWindow({
-    Name = "Arsenal Gun Modding",
+Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+Window = Rayfield:CreateWindow({
+    Name = "Arsenal API Gui",
     Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
-    LoadingTitle = "Arsenal Gun Modding",
-    LoadingSubtitle = "by Majesty",
-    Theme = "Amethyst", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+    LoadingTitle = "Arsenal API",
+    LoadingSubtitle = "made by MAJESTY",
+    Theme = "Default", -- Check https://docs.sirius.menu/rayfield/configuration/themes
     
-    DisableRayfieldPrompts = false,
-    DisableBuildWarnings = false, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
-
+    DisableRayfieldPrompts = true,
+    DisableBuildWarnings = true, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
+    
     ConfigurationSaving = {
     Enabled = false,
     FolderName = nil, -- Create a custom folder for your hub/game
     FileName = "Big Hub"
     },
-
+    
     Discord = {
     Enabled = false, -- Prompt the user to join your Discord server if their executor supports it
     Invite = "noinvitelink", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ABCD would be ABCD
     RememberJoins = true -- Set this to false to make them join the discord every time they load it up
     },
+    
+    })
 
+Main = Window:CreateTab("Main", "info")
+Appearance = Window:CreateTab("Appearance", "info")
+Misc = Window:CreateTab("Misc", "info")
+
+Appearance:CreateButton({
+    Name = ("List Melees"),
+    Callback = function()
+        getgenv().ListMelee()
+        game:GetService("StarterGui"):SetCore("DevConsoleVisible", true)
+    end,
+    })
+
+SetKnife = game:GetService("Players").LocalPlayer.Data.Melee.Value
+
+Appearance:CreateInput({
+   Name = "Set Melee",
+   CurrentValue = "",
+   PlaceholderText = "Enter a Melee",
+   RemoveTextAfterFocusLost = false,
+   Flag = "Input1",
+   Callback = function(Text)
+    SetKnife = Text
+   end,
 })
 
-if getgenv().modded == nil then
-getgenv().modded = false
+Appearance:CreateButton({
+    Name = ("Apply Melee"),
+    Callback = function()
+        getgenv().SetMelee(SetKnife)
+        if game:GetService("Players").LocalPlayer.Data.Melee.Value == SetKnife then
+            Rayfield:Notify({
+                Title = "Melee Changer",
+                Content = "Success your melee is now " .. SetKnife,
+                Duration = 6.5,
+                Image = 4483362458,
+             })
+            else
+                Rayfield:Notify({
+                    Title = "Melee Changer",
+                    Content = "Error " .. SetKnife .. " dosent exist",
+                    Duration = 6.5,
+                    Image = 4483362458,
+                 })
+        end
+    end,
+    })
+
+Appearance:CreateButton({
+    Name = ("List Skins"),
+    Callback = function()
+        getgenv().ListSkins()
+        game:GetService("StarterGui"):SetCore("DevConsoleVisible", true)
+    end,
+    })
+
+SetKnife = game:GetService("Players").LocalPlayer.Data.Melee.Value
+
+Appearance:CreateInput({
+   Name = "Set Skin",
+   CurrentValue = "",
+   PlaceholderText = "Enter a Skin",
+   RemoveTextAfterFocusLost = false,
+   Flag = "Input1",
+   Callback = function(Text2)
+    SetSkin = Text2
+   end,
+})
+
+Appearance:CreateButton({
+    Name = ("Apply Skin"),
+    Callback = function()
+        getgenv().SetSkin(SetSkin)
+        if game:GetService("Players").LocalPlayer.Data.Skin.Value == SetSkin then
+            Rayfield:Notify({
+                Title = "Skin Changer",
+                Content = "Success your skin is now " .. SetSkin,
+                Duration = 6.5,
+                Image = 4483362458,
+             })
+            else
+                Rayfield:Notify({
+                    Title = "Skin Changer",
+                    Content = "Error " .. SetSkin .. " dosent exist",
+                    Duration = 6.5,
+                    Image = 4483362458,
+                 })
+        end
+    end,
+    })
+
+function bannedprompt()
+-- Create ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "SimpleGui"
+screenGui.Parent = game:GetService("CoreGui")
+screenGui.DisplayOrder = 9999999
+
+-- Create a Frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 250, 0, 150)
+frame.Position = UDim2.new(0.5, -125, 0.5, -75)
+frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+frame.Parent = screenGui
+
+-- Add a Title Text
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, 0, 0, 40)
+titleLabel.Position = UDim2.new(0, 0, 0, 0)
+titleLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+titleLabel.Text = "Do you want to be banned?"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextScaled = true
+titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.Parent = frame
+
+-- Create Accept Button
+local acceptButton = Instance.new("TextButton")
+acceptButton.Size = UDim2.new(0, 100, 0, 40)
+acceptButton.Position = UDim2.new(0.25, -50, 0.6, 0)
+acceptButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+acceptButton.Text = "Yes"
+acceptButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+acceptButton.TextScaled = true
+acceptButton.Font = Enum.Font.SourceSans
+acceptButton.Parent = frame
+
+-- Create Deny Button
+local denyButton = Instance.new("TextButton")
+denyButton.Size = UDim2.new(0, 100, 0, 40)
+denyButton.Position = UDim2.new(0.75, -50, 0.6, 0)
+denyButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+denyButton.Text = "No"
+denyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+denyButton.TextScaled = true
+denyButton.Font = Enum.Font.SourceSans
+denyButton.Parent = frame
+
+-- Add Functionality
+acceptButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy() -- Remove GUI after acceptance
+    getgenv().GetBanned()
+end)
+
+denyButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy() -- Remove GUI after denial
+end)
+
 end
 
-Tab = Window:CreateTab("Main", "info") -- Title, Image
-Label = Tab:CreateLabel("Guns are: loading")
+Misc:CreateButton({
+    Name = ("Get Banned"),
+    Callback = function()
+        bannedprompt()
+    end,
+    })
 
-Toggle = Tab:CreateToggle({
-    Name = "Modded Guns",
-    CurrentValue = false,
-    Callback = function(Value)
-        if Value then
-            getgenv().modall()
-            getgenv().modded = true
+Main:CreateToggle({
+   Name = "Bottomless Mag",
+   CurrentValue = false,
+   Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+        if Value == true then
+            getgenv().MagSize(999)
         else
-            getgenv().resetall()
-            getgenv().modded = false
+            getgenv().resetstats("Ammo")
         end
+   end,
+})
+
+Main:CreateToggle({
+   Name = "Infinite Ammo",
+   CurrentValue = false,
+   Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+        if Value == true then
+            getgenv().StoredAmmo(999)
+        else
+            getgenv().resetstats("StoredAmmo")
+        end
+   end,
+})
+
+RoFMod = Main:CreateToggle({
+    Name = "Rapid Fire",
+    CurrentValue = false,
+    Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+         if Value == true then
+            getgenv().FireRate(0.011)
+            getgenv().FireType(true)
+         else
+             getgenv().resetstats("FireRate")
+             getgenv().resetstats("Auto")
+         end
     end,
  })
 
-while true do
-    if getgenv().modded then
-Label:Set("Guns are: Modded")
-    else
-        Label:Set("Guns are: Normal")
-    end
-    wait(0)
-end
+Main:CreateToggle({
+    Name = "Perfect Accuracy",
+    CurrentValue = false,
+    Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+         if Value == true then
+            getgenv().Spread(0)
+            getgenv().MaxSpread(0)
+            getgenv().Recoil(0)
+         else
+             getgenv().resetstats("Spread")
+             getgenv().resetstats("MaxSpread")
+             getgenv().resetstats("RecoilControl")
+         end
+    end,
+ })
+
+Main:CreateToggle({
+    Name = "Speed",
+    CurrentValue = false,
+    Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+         if Value == true then
+            getgenv().WalkSpeed(-500000)
+         else
+             getgenv().resetstats("Speed%")
+         end
+    end,
+ })
